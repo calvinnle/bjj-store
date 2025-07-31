@@ -13,6 +13,7 @@ type Config struct {
 	JWT      JWTConfig      `mapstructure:"jwt"`
 	Stripe   StripeConfig   `mapstructure:"stripe"`
 	Admin    AdminConfig    `mapstructure:"admin"`
+	MinIO    MinIOConfig    `mapstructure:"minio"`
 }
 
 type AdminConfig struct {
@@ -41,6 +42,15 @@ type JWTConfig struct {
 type StripeConfig struct {
 	SecretKey     string `mapstructure:"secret_key"`
 	WebhookSecret string `mapstructure:"webhook_secret"`
+}
+
+type MinIOConfig struct {
+	Endpoint        string `mapstructure:"endpoint"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	SecretAccessKey string `mapstructure:"secret_access_key"`
+	BucketName      string `mapstructure:"bucket_name"`
+	UseSSL          bool   `mapstructure:"use_ssl"`
+	Region          string `mapstructure:"region"`
 }
 
 var AppConfig *Config
@@ -114,4 +124,12 @@ func setDefaults() {
 
 	viper.SetDefault("stripe.secret_key", "")
 	viper.SetDefault("stripe.webhook_secret", "")
+
+	// MinIO defaults
+	viper.SetDefault("minio.endpoint", "localhost:9000")
+	viper.SetDefault("minio.access_key_id", "admin")
+	viper.SetDefault("minio.secret_access_key", "admin123456")
+	viper.SetDefault("minio.bucket_name", "bjj-store-images")
+	viper.SetDefault("minio.use_ssl", false)
+	viper.SetDefault("minio.region", "us-east-1")
 }

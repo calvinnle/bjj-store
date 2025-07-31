@@ -92,30 +92,12 @@ func CreateOrder(c *gin.Context) {
 			return
 		}
 
-		// Check stock availability
+		// Check stock availability (but don't reduce yet - only on successful payment)
 		if !product.HasSufficientStock(item.Quantity) {
 			tx.Rollback()
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": fmt.Sprintf("Insufficient stock for %s. Available: %d, Requested: %d",
 					product.Name, product.Stock, item.Quantity),
-			})
-			return
-		}
-
-		// Reduce stock
-		if err := product.ReduceStock(item.Quantity); err != nil {
-			tx.Rollback()
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		// Update product stock in database
-		if err := tx.Save(&product).Error; err != nil {
-			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to update product stock",
 			})
 			return
 		}

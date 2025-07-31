@@ -12,6 +12,7 @@ import (
 	"github.com/calvinnle/bjj-store/backend/handlers"
 	"github.com/calvinnle/bjj-store/backend/middleware"
 	"github.com/calvinnle/bjj-store/backend/models"
+	"github.com/calvinnle/bjj-store/backend/services"
 )
 
 // @title BJJ Store API
@@ -43,6 +44,11 @@ func main() {
 
 	// Auto migrate database
 	models.AutoMigrate()
+
+	// Initialize MinIO
+	if err := services.InitMinIO(); err != nil {
+		log.Fatalf("Failed to initialize MinIO: %v", err)
+	}
 
 	// Setup Gin router
 	if config.AppConfig.Server.Environment == "production" {
@@ -78,6 +84,9 @@ func main() {
 		api.GET("/orders/track/:orderNumber", handlers.TrackOrder)
 		api.GET("/orders/email/:email", handlers.GetOrdersByEmail)
 
+		// Payment routes (public)
+		api.POST("/payment/process", handlers.ProcessPayment)
+
 		// Admin authentication routes (no auth required for login)
 		adminAuth := api.Group("/admin/auth")
 		{
@@ -100,6 +109,10 @@ func main() {
 			// Order management (require order permissions)
 			adminAPI.GET("/orders", middleware.RequirePermission("view_orders"), handlers.GetAllOrders)
 			adminAPI.PUT("/orders/:id/status", middleware.RequirePermission("update_orders"), handlers.UpdateOrderStatus)
+
+			// Image upload (require product permissions)
+			adminAPI.POST("/upload/image", middleware.RequirePermission("create_products"), handlers.UploadImage)
+			adminAPI.DELETE("/upload/image", middleware.RequirePermission("delete_products"), handlers.DeleteImage)
 		}
 	}
 

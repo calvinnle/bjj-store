@@ -16,3 +16,11 @@ jwt:
 admin:
   default_email: admin@bjjstore.com
   default_password: admin123
+
+minio:
+  endpoint: localhost:9000
+  access_key_id: admin
+  secret_access_key: admin123456
+  bucket_name: bjj-store-images
+  use_ssl: false
+  region: us-east-1
