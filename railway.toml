@@ -1,0 +1,21 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+
+[[services]]
+name = "backend"
+source = "backend/"
+variables = { PORT = "8080" }
+
+[[services]]
+name = "frontend"
+source = "frontend/"
+variables = { PORT = "80" }
+
+[[services]]
+name = "postgres"
+template = "postgres"
