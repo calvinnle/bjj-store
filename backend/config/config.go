@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -100,6 +101,9 @@ func LoadConfig() {
 		log.Fatalf("Unable to decode config: %v", err)
 	}
 
+	// Override with Railway environment variables if they exist
+	overrideWithEnvVars(&config)
+	
 	AppConfig = &config
 	log.Printf("Configuration loaded successfully")
 	log.Printf("Database: %s:%s/%s", config.Database.Host, config.Database.Port, config.Database.Name)
@@ -137,4 +141,61 @@ func setDefaults() {
 	viper.SetDefault("minio.bucket_name", "bjj-store-images")
 	viper.SetDefault("minio.use_ssl", false)
 	viper.SetDefault("minio.region", "us-east-1")
+}
+
+// overrideWithEnvVars directly reads Railway environment variables
+func overrideWithEnvVars(config *Config) {
+	log.Printf("Checking for Railway environment variables...")
+	
+	// Database overrides
+	if host := os.Getenv("DATABASE_HOST"); host != "" {
+		config.Database.Host = host
+		log.Printf("Override DATABASE_HOST: %s", host)
+	}
+	if port := os.Getenv("DATABASE_PORT"); port != "" {
+		config.Database.Port = port
+		log.Printf("Override DATABASE_PORT: %s", port)
+	}
+	if user := os.Getenv("DATABASE_USER"); user != "" {
+		config.Database.User = user
+		log.Printf("Override DATABASE_USER: %s", user)
+	}
+	if password := os.Getenv("DATABASE_PASSWORD"); password != "" {
+		config.Database.Password = password
+		log.Printf("Override DATABASE_PASSWORD: [HIDDEN]")
+	}
+	if name := os.Getenv("DATABASE_NAME"); name != "" {
+		config.Database.Name = name
+		log.Printf("Override DATABASE_NAME: %s", name)
+	}
+	if sslMode := os.Getenv("DATABASE_SSL_MODE"); sslMode != "" {
+		config.Database.SSLMode = sslMode
+		log.Printf("Override DATABASE_SSL_MODE: %s", sslMode)
+	}
+	
+	// Server overrides
+	if port := os.Getenv("SERVER_PORT"); port != "" {
+		config.Server.Port = port
+		log.Printf("Override SERVER_PORT: %s", port)
+	}
+	if env := os.Getenv("SERVER_ENVIRONMENT"); env != "" {
+		config.Server.Environment = env
+		log.Printf("Override SERVER_ENVIRONMENT: %s", env)
+	}
+	
+	// JWT override
+	if secret := os.Getenv("JWT_SECRET"); secret != "" {
+		config.JWT.Secret = secret
+		log.Printf("Override JWT_SECRET: [HIDDEN]")
+	}
+	
+	// Admin overrides
+	if email := os.Getenv("ADMIN_DEFAULT_EMAIL"); email != "" {
+		config.Admin.DefaultEmail = email
+		log.Printf("Override ADMIN_DEFAULT_EMAIL: %s", email)
+	}
+	if password := os.Getenv("ADMIN_DEFAULT_PASSWORD"); password != "" {
+		config.Admin.DefaultPassword = password
+		log.Printf("Override ADMIN_DEFAULT_PASSWORD: [HIDDEN]")
+	}
 }
