@@ -72,6 +72,11 @@ func LoadConfig() {
 	// Enable automatic environment variable reading
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	
+	// Debug: Log environment variables
+	log.Printf("DEBUG - DATABASE_HOST env: %s", viper.GetString("database.host"))
+	log.Printf("DEBUG - DATABASE_PORT env: %s", viper.GetString("database.port"))
+	log.Printf("DEBUG - DATABASE_USER env: %s", viper.GetString("database.user"))
 
 	// Try to read config.yaml first
 	if err := viper.ReadInConfig(); err != nil {
