@@ -42,10 +42,7 @@ func main() {
 	// Auto migrate database
 	models.AutoMigrate()
 
-	// Initialize MinIO
-	if err := services.InitMinIO(); err != nil {
-		log.Fatalf("Failed to initialize MinIO: %v", err)
-	}
+	// MinIO removed - using direct image URLs instead
 
 	// Setup Gin router
 	if config.AppConfig.Server.Environment == "production" {
@@ -118,9 +115,6 @@ func main() {
 			adminAPI.GET("/orders", middleware.RequirePermission("view_orders"), handlers.GetAllOrders)
 			adminAPI.PUT("/orders/:id/status", middleware.RequirePermission("update_orders"), handlers.UpdateOrderStatus)
 
-			// Image upload (require product permissions)
-			adminAPI.POST("/upload/image", middleware.RequirePermission("create_products"), handlers.UploadImage)
-			adminAPI.DELETE("/upload/image", middleware.RequirePermission("delete_products"), handlers.DeleteImage)
 		}
 	}
 

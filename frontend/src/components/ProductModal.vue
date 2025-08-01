@@ -90,83 +90,25 @@
               <p v-if="errors.stock" class="text-red-500 text-sm mt-1">{{ errors.stock }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Product Image URL</label>
               
-              <!-- Image Upload Area -->
+              <!-- Image URL Input -->
               <div class="space-y-4">
-                <!-- Current Image Preview -->
-                <div v-if="imagePreview || form.image_url" class="relative">
+                <input
+                  v-model="form.image_url"
+                  type="url"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <p class="text-sm text-gray-500">Enter a direct link to the product image</p>
+                
+                <!-- Image Preview -->
+                <div v-if="form.image_url" class="relative">
                   <img 
-                    :src="imagePreview || form.image_url" 
+                    :src="form.image_url" 
                     alt="Product preview" 
                     class="w-32 h-32 object-cover rounded-lg border border-gray-300"
                   />
-                  <button
-                    type="button"
-                    @click="clearImage"
-                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <!-- Upload Options -->
-                <div class="space-y-3">
-                  <!-- File Upload -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-2">Upload from device:</label>
-                    <div class="flex items-center space-x-3">
-                      <input
-                        ref="fileInput"
-                        type="file"
-                        accept="image/*"
-                        @change="handleFileUpload"
-                        class="hidden"
-                      />
-                      <button
-                        type="button"
-                        @click="$refs.fileInput?.click()"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
-                      >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
-                        <span>Choose Image</span>
-                      </button>
-                      <span v-if="selectedFile" class="text-sm text-gray-600">{{ selectedFile.name }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Or URL Input -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-2">Or enter image URL:</label>
-                    <input
-                      v-model="form.image_url"
-                      type="url"
-                      @input="handleUrlInput"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
-                </div>
-
-                <!-- Upload Progress -->
-                <div v-if="uploadProgress > 0 && uploadProgress < 100" class="space-y-2">
-                  <div class="flex justify-between text-sm text-gray-600">
-                    <span>Uploading...</span>
-                    <span>{{ uploadProgress }}%</span>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" :style="`width: ${uploadProgress}%`"></div>
-                  </div>
-                </div>
-
-                <!-- Upload Success -->
-                <div v-if="uploadProgress === 100" class="flex items-center space-x-2 text-green-600 text-sm">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  <span>Image uploaded successfully!</span>
                 </div>
               </div>
             </div>
@@ -211,7 +153,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { Product } from '@/types'
-import { uploadService } from '@/services/upload'
 
 interface Props {
   product?: Product | null
@@ -239,11 +180,8 @@ const form = ref({
   size_options: ''
 })
 
-// File upload state
-const selectedFile = ref<File | null>(null)
-const imagePreview = ref('')
-const uploadProgress = ref(0)
-const fileInput = ref<HTMLInputElement>()
+// State
+const imageError = ref(false)
 
 // Form validation
 const errors = ref({} as Record<string, string>)
@@ -276,83 +214,6 @@ const validateForm = () => {
   return Object.keys(errors.value).length === 0
 }
 
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  
-  if (!file) return
-
-  // Validate file type
-  if (!file.type.startsWith('image/')) {
-    alert('Please select an image file')
-    return
-  }
-
-  // Validate file size (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    alert('Image size must be less than 5MB')
-    return
-  }
-
-  selectedFile.value = file
-  
-  // Create preview
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    imagePreview.value = e.target?.result as string
-    form.value.image_url = '' // Clear URL when file is selected
-  }
-  reader.readAsDataURL(file)
-}
-
-const handleUrlInput = () => {
-  if (form.value.image_url) {
-    selectedFile.value = null
-    imagePreview.value = ''
-  }
-}
-
-const clearImage = () => {
-  selectedFile.value = null
-  imagePreview.value = ''
-  form.value.image_url = ''
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
-}
-
-const uploadImage = async (): Promise<string> => {
-  if (!selectedFile.value) return form.value.image_url
-
-  uploadProgress.value = 1 // Start progress
-
-  try {
-    // Simulate progress for better UX
-    const progressInterval = setInterval(() => {
-      if (uploadProgress.value < 90) {
-        uploadProgress.value += Math.random() * 10
-      }
-    }, 100)
-
-    const imageUrl = await uploadService.uploadImage(selectedFile.value)
-
-    clearInterval(progressInterval)
-    uploadProgress.value = 100
-    
-    // Keep success message for a few seconds
-    setTimeout(() => {
-      if (uploadProgress.value === 100) {
-        uploadProgress.value = 0
-      }
-    }, 3000)
-    
-    return imageUrl
-  } catch (error) {
-    uploadProgress.value = 0
-    console.error('Image upload error:', error)
-    throw error
-  }
-}
 
 const handleSubmit = async () => {
   if (!validateForm()) return
@@ -360,30 +221,20 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Upload image if file is selected
-    let imageUrl = form.value.image_url
-    if (selectedFile.value) {
-      imageUrl = await uploadImage()
-    }
-
     const productData = {
       name: form.value.name.trim(),
       description: form.value.description.trim(),
       price: form.value.price,
       category: form.value.category.trim(),
       stock: form.value.stock,
-      image_url: imageUrl.trim(),
+      image_url: form.value.image_url.trim(),
       size_options: form.value.size_options.trim()
     }
 
     emit('save', productData)
   } catch (error: any) {
     console.error('Form submission error:', error)
-    let errorMessage = 'Failed to save product. Please try again.'
-    if (error instanceof Error) {
-      errorMessage = `Failed to save product: ${error.message}`
-    }
-    alert(errorMessage)
+    alert('Failed to save product. Please try again.')
   } finally {
     loading.value = false
   }
@@ -405,19 +256,9 @@ watch(() => props.product, (newProduct) => {
           ? newProduct.size_options.join(', ')
           : ''
     }
-    // Clear upload state when switching products
-    clearImage()
+    imageError.value = false
   }
 }, { immediate: true })
-
-// Watch for modal close to reset upload state
-watch(() => props.product, (newProduct, oldProduct) => {
-  if (!newProduct && oldProduct) {
-    // Modal is closing, reset upload state
-    clearImage()
-    uploadProgress.value = 0
-  }
-})
 
 // Initialize form on mount
 onMounted(() => {
