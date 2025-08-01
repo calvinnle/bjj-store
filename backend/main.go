@@ -9,7 +9,6 @@ import (
 	"github.com/calvinnle/bjj-store/backend/handlers"
 	"github.com/calvinnle/bjj-store/backend/middleware"
 	"github.com/calvinnle/bjj-store/backend/models"
-	"github.com/calvinnle/bjj-store/backend/services"
 )
 
 // @title BJJ Store API
