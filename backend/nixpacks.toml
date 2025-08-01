@@ -1,0 +1,11 @@
+[phases.setup]
+nixPacks = ['go']
+
+[phases.build]
+cmds = [
+  'go mod download',
+  'go build -o main .'
+]
+
+[start]
+cmd = './main'
