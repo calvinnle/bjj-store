@@ -233,7 +233,11 @@ func overrideWithEnvVars(config *Config) {
 	log.Printf("  POSTGRES_HOST: %s", postgresHost)
 	log.Printf("  POSTGRES_PORT: %s", postgresPort)
 	log.Printf("  POSTGRES_USER: %s", postgresUser)
-	log.Printf("  POSTGRES_PASSWORD: %s", if postgresPassword != "" { "[HIDDEN]" } else { "" })
+	if postgresPassword != "" {
+		log.Printf("  POSTGRES_PASSWORD: [HIDDEN]")
+	} else {
+		log.Printf("  POSTGRES_PASSWORD: ")
+	}
 	log.Printf("  POSTGRES_DB: %s", postgresDB)
 	
 	// Server overrides
