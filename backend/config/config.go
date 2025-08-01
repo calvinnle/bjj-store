@@ -222,14 +222,14 @@ func overrideWithEnvVars(config *Config) {
 		log.Printf("✗ DATABASE_URL not found")
 	}
 	
-	// Check if Railway uses different variable names
+	// Check Railway Postgres reference variables
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	postgresPort := os.Getenv("POSTGRES_PORT")
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
 	
-	log.Printf("Alternative postgres variables:")
+	log.Printf("Railway postgres reference variables:")
 	log.Printf("  POSTGRES_HOST: %s", postgresHost)
 	log.Printf("  POSTGRES_PORT: %s", postgresPort)
 	log.Printf("  POSTGRES_USER: %s", postgresUser)
@@ -239,6 +239,38 @@ func overrideWithEnvVars(config *Config) {
 		log.Printf("  POSTGRES_PASSWORD: ")
 	}
 	log.Printf("  POSTGRES_DB: %s", postgresDB)
+	
+	// Use Railway Postgres variables if DATABASE_ variables are not set
+	if config.Database.Host == "localhost" && postgresHost != "" {
+		config.Database.Host = postgresHost
+		log.Printf("✓ Using POSTGRES_HOST for database host: %s", postgresHost)
+	}
+	
+	if config.Database.Port == "5432" && postgresPort != "" {
+		config.Database.Port = postgresPort
+		log.Printf("✓ Using POSTGRES_PORT for database port: %s", postgresPort)
+	}
+	
+	if config.Database.User == "postgres" && postgresUser != "" {
+		config.Database.User = postgresUser
+		log.Printf("✓ Using POSTGRES_USER for database user: %s", postgresUser)
+	}
+	
+	if config.Database.Password == "password" && postgresPassword != "" {
+		config.Database.Password = postgresPassword
+		log.Printf("✓ Using POSTGRES_PASSWORD for database password: [HIDDEN]")
+	}
+	
+	if config.Database.Name == "bjj_store" && postgresDB != "" {
+		config.Database.Name = postgresDB
+		log.Printf("✓ Using POSTGRES_DB for database name: %s", postgresDB)
+	}
+	
+	// Set SSL mode to require for Railway
+	if postgresHost != "" {
+		config.Database.SSLMode = "require"
+		log.Printf("✓ Set SSL mode to 'require' for Railway Postgres")
+	}
 	
 	// Server overrides
 	if port := os.Getenv("SERVER_PORT"); port != "" {
