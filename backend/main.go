@@ -4,8 +4,11 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/calvinnle/bjj-store/backend/config"
+	_ "github.com/calvinnle/bjj-store/backend/docs" // Import generated docs
 	"github.com/calvinnle/bjj-store/backend/handlers"
 	"github.com/calvinnle/bjj-store/backend/middleware"
 	"github.com/calvinnle/bjj-store/backend/models"
@@ -57,19 +60,8 @@ func main() {
 	// Add CORS middleware
 	r.Use(middleware.CORSMiddleware())
 
-	// API documentation endpoint (placeholder)
-	r.GET("/docs", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "BJJ Store API Documentation",
-			"version": "1.0",
-			"endpoints": gin.H{
-				"health": "GET /api/health",
-				"products": "GET /api/products",
-				"orders": "POST /api/orders",
-				"admin": "POST /api/admin/auth/login",
-			},
-		})
-	})
+	// Swagger documentation
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Health check
 	r.GET("/api/health", func(c *gin.Context) {

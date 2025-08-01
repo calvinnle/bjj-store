@@ -17,9 +17,12 @@ func ConnectDatabase() {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name, cfg.SSLMode)
 
+	log.Printf("Connecting to database with DSN: host=%s port=%s user=%s dbname=%s sslmode=%s", 
+		cfg.Host, cfg.Port, cfg.User, cfg.Name, cfg.SSLMode)
+	
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	DB = database
@@ -27,11 +30,13 @@ func ConnectDatabase() {
 }
 
 func AutoMigrate() {
+	log.Println("Starting database migration...")
+	
 	err := DB.AutoMigrate(&Product{}, &Order{}, &OrderItem{}, &AdminUser{}, &AdminSession{})
 	if err != nil {
-		log.Fatal("Failed to migrate database:", err)
+		log.Fatalf("Failed to migrate database: %v", err)
 	}
-	log.Println("Database migration completed!")
+	log.Println("Database migration completed successfully!")
 
 	// Create default admin user if none exists
 	createDefaultAdmin()
