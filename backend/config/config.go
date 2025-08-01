@@ -222,23 +222,42 @@ func overrideWithEnvVars(config *Config) {
 		log.Printf("✗ DATABASE_URL not found")
 	}
 	
-	// Check Railway Postgres reference variables
+	// Check Railway Postgres reference variables (multiple possible names)
 	postgresHost := os.Getenv("POSTGRES_HOST")
+	if postgresHost == "" {
+		postgresHost = os.Getenv("PGHOST")
+	}
+	
 	postgresPort := os.Getenv("POSTGRES_PORT")
+	if postgresPort == "" {
+		postgresPort = os.Getenv("PGPORT")
+	}
+	
 	postgresUser := os.Getenv("POSTGRES_USER")
+	if postgresUser == "" {
+		postgresUser = os.Getenv("PGUSER")
+	}
+	
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	if postgresPassword == "" {
+		postgresPassword = os.Getenv("PGPASSWORD")
+	}
+	
 	postgresDB := os.Getenv("POSTGRES_DB")
+	if postgresDB == "" {
+		postgresDB = os.Getenv("PGDATABASE")
+	}
 	
 	log.Printf("Railway postgres reference variables:")
-	log.Printf("  POSTGRES_HOST: %s", postgresHost)
-	log.Printf("  POSTGRES_PORT: %s", postgresPort)
-	log.Printf("  POSTGRES_USER: %s", postgresUser)
+	log.Printf("  POSTGRES_HOST/PGHOST: %s", postgresHost)
+	log.Printf("  POSTGRES_PORT/PGPORT: %s", postgresPort)
+	log.Printf("  POSTGRES_USER/PGUSER: %s", postgresUser)
 	if postgresPassword != "" {
-		log.Printf("  POSTGRES_PASSWORD: [HIDDEN]")
+		log.Printf("  POSTGRES_PASSWORD/PGPASSWORD: [HIDDEN]")
 	} else {
-		log.Printf("  POSTGRES_PASSWORD: ")
+		log.Printf("  POSTGRES_PASSWORD/PGPASSWORD: ")
 	}
-	log.Printf("  POSTGRES_DB: %s", postgresDB)
+	log.Printf("  POSTGRES_DB/PGDATABASE: %s", postgresDB)
 	
 	// Use Railway Postgres variables if DATABASE_ variables are not set
 	if config.Database.Host == "localhost" && postgresHost != "" {
