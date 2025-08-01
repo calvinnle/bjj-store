@@ -14,8 +14,19 @@ var DB *gorm.DB
 func ConnectDatabase() {
 	cfg := config.AppConfig.Database
 
+	log.Printf("=== DATABASE CONNECTION DEBUG ===")
+	log.Printf("Attempting to connect with config:")
+	log.Printf("  Host: %s", cfg.Host)
+	log.Printf("  Port: %s", cfg.Port)  
+	log.Printf("  User: %s", cfg.User)
+	log.Printf("  Database Name: %s", cfg.Name)
+	log.Printf("  SSL Mode: %s", cfg.SSLMode)
+
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name, cfg.SSLMode)
+	
+	log.Printf("DSN (password hidden): host=%s port=%s user=%s password=[HIDDEN] dbname=%s sslmode=%s",
+		cfg.Host, cfg.Port, cfg.User, cfg.Name, cfg.SSLMode)
 
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

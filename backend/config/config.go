@@ -145,57 +145,134 @@ func setDefaults() {
 
 // overrideWithEnvVars directly reads Railway environment variables
 func overrideWithEnvVars(config *Config) {
-	log.Printf("Checking for Railway environment variables...")
+	log.Printf("=== ENVIRONMENT VARIABLE DEBUG ===")
 	
-	// Database overrides
+	// Print ALL environment variables to see what Railway is providing
+	log.Printf("All environment variables:")
+	for _, env := range os.Environ() {
+		log.Printf("  %s", env)
+	}
+	
+	log.Printf("=== CHECKING SPECIFIC VARIABLES ===")
+	
+	// Check Railway-specific variables
+	railwayEnv := os.Getenv("RAILWAY_ENVIRONMENT")
+	log.Printf("RAILWAY_ENVIRONMENT: %s", railwayEnv)
+	
+	railwayService := os.Getenv("RAILWAY_SERVICE_NAME")
+	log.Printf("RAILWAY_SERVICE_NAME: %s", railwayService)
+	
+	// Database overrides with detailed logging
+	log.Printf("Checking database environment variables...")
+	
 	if host := os.Getenv("DATABASE_HOST"); host != "" {
+		log.Printf("FOUND DATABASE_HOST: %s", host)
 		config.Database.Host = host
-		log.Printf("Override DATABASE_HOST: %s", host)
+		log.Printf("✓ Override DATABASE_HOST: %s", host)
+	} else {
+		log.Printf("✗ DATABASE_HOST not found or empty")
 	}
+	
 	if port := os.Getenv("DATABASE_PORT"); port != "" {
+		log.Printf("FOUND DATABASE_PORT: %s", port)
 		config.Database.Port = port
-		log.Printf("Override DATABASE_PORT: %s", port)
+		log.Printf("✓ Override DATABASE_PORT: %s", port)
+	} else {
+		log.Printf("✗ DATABASE_PORT not found or empty")
 	}
+	
 	if user := os.Getenv("DATABASE_USER"); user != "" {
+		log.Printf("FOUND DATABASE_USER: %s", user)
 		config.Database.User = user
-		log.Printf("Override DATABASE_USER: %s", user)
+		log.Printf("✓ Override DATABASE_USER: %s", user)
+	} else {
+		log.Printf("✗ DATABASE_USER not found or empty")
 	}
+	
 	if password := os.Getenv("DATABASE_PASSWORD"); password != "" {
+		log.Printf("FOUND DATABASE_PASSWORD: [HIDDEN]")
 		config.Database.Password = password
-		log.Printf("Override DATABASE_PASSWORD: [HIDDEN]")
+		log.Printf("✓ Override DATABASE_PASSWORD: [HIDDEN]")
+	} else {
+		log.Printf("✗ DATABASE_PASSWORD not found or empty")
 	}
+	
 	if name := os.Getenv("DATABASE_NAME"); name != "" {
+		log.Printf("FOUND DATABASE_NAME: %s", name)
 		config.Database.Name = name
-		log.Printf("Override DATABASE_NAME: %s", name)
+		log.Printf("✓ Override DATABASE_NAME: %s", name)
+	} else {
+		log.Printf("✗ DATABASE_NAME not found or empty")
 	}
+	
 	if sslMode := os.Getenv("DATABASE_SSL_MODE"); sslMode != "" {
+		log.Printf("FOUND DATABASE_SSL_MODE: %s", sslMode)
 		config.Database.SSLMode = sslMode
-		log.Printf("Override DATABASE_SSL_MODE: %s", sslMode)
+		log.Printf("✓ Override DATABASE_SSL_MODE: %s", sslMode)
+	} else {
+		log.Printf("✗ DATABASE_SSL_MODE not found or empty")
 	}
+	
+	// Try alternative Railway PostgreSQL environment variable names
+	log.Printf("=== CHECKING RAILWAY POSTGRES VARIABLES ===")
+	if dbUrl := os.Getenv("DATABASE_URL"); dbUrl != "" {
+		log.Printf("FOUND DATABASE_URL: %s", dbUrl)
+		// Don't parse it here, just log it exists
+	} else {
+		log.Printf("✗ DATABASE_URL not found")
+	}
+	
+	// Check if Railway uses different variable names
+	postgresHost := os.Getenv("POSTGRES_HOST")
+	postgresPort := os.Getenv("POSTGRES_PORT")
+	postgresUser := os.Getenv("POSTGRES_USER")
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	postgresDB := os.Getenv("POSTGRES_DB")
+	
+	log.Printf("Alternative postgres variables:")
+	log.Printf("  POSTGRES_HOST: %s", postgresHost)
+	log.Printf("  POSTGRES_PORT: %s", postgresPort)
+	log.Printf("  POSTGRES_USER: %s", postgresUser)
+	log.Printf("  POSTGRES_PASSWORD: %s", if postgresPassword != "" { "[HIDDEN]" } else { "" })
+	log.Printf("  POSTGRES_DB: %s", postgresDB)
 	
 	// Server overrides
 	if port := os.Getenv("SERVER_PORT"); port != "" {
 		config.Server.Port = port
-		log.Printf("Override SERVER_PORT: %s", port)
+		log.Printf("✓ Override SERVER_PORT: %s", port)
+	} else if port := os.Getenv("PORT"); port != "" {
+		// Railway often uses PORT instead of SERVER_PORT
+		config.Server.Port = port
+		log.Printf("✓ Override SERVER_PORT from PORT: %s", port)
 	}
+	
 	if env := os.Getenv("SERVER_ENVIRONMENT"); env != "" {
 		config.Server.Environment = env
-		log.Printf("Override SERVER_ENVIRONMENT: %s", env)
+		log.Printf("✓ Override SERVER_ENVIRONMENT: %s", env)
 	}
 	
 	// JWT override
 	if secret := os.Getenv("JWT_SECRET"); secret != "" {
 		config.JWT.Secret = secret
-		log.Printf("Override JWT_SECRET: [HIDDEN]")
+		log.Printf("✓ Override JWT_SECRET: [HIDDEN]")
 	}
 	
 	// Admin overrides
 	if email := os.Getenv("ADMIN_DEFAULT_EMAIL"); email != "" {
 		config.Admin.DefaultEmail = email
-		log.Printf("Override ADMIN_DEFAULT_EMAIL: %s", email)
+		log.Printf("✓ Override ADMIN_DEFAULT_EMAIL: %s", email)
 	}
 	if password := os.Getenv("ADMIN_DEFAULT_PASSWORD"); password != "" {
 		config.Admin.DefaultPassword = password
-		log.Printf("Override ADMIN_DEFAULT_PASSWORD: [HIDDEN]")
+		log.Printf("✓ Override ADMIN_DEFAULT_PASSWORD: [HIDDEN]")
 	}
+	
+	log.Printf("=== FINAL CONFIG VALUES ===")
+	log.Printf("Database Host: %s", config.Database.Host)
+	log.Printf("Database Port: %s", config.Database.Port)
+	log.Printf("Database User: %s", config.Database.User)
+	log.Printf("Database Name: %s", config.Database.Name)
+	log.Printf("Database SSL Mode: %s", config.Database.SSLMode)
+	log.Printf("Server Port: %s", config.Server.Port)
+	log.Printf("Server Environment: %s", config.Server.Environment)
 }
