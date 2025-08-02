@@ -71,7 +71,8 @@
 
         <!-- Results Count -->
         <div class="mt-4 text-sm text-gray-600">
-          Showing {{ filteredProductsCount }} of {{ products_store.products.length }} products
+          Showing {{ paginatedProducts.length }} of {{ filteredProductsCount }} products
+          <span v-if="totalPages > 1">(Page {{ currentPage }} of {{ totalPages }})</span>
         </div>
       </div>
 
@@ -95,75 +96,93 @@
       </div>
 
       <!-- Products Grid -->
-      <div v-else-if="products_store.filteredProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div
-          v-for="product in products_store.filteredProducts"
-          :key="product.id"
-          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-        >
-          <!-- Product Image -->
-          <router-link :to="`/products/${product.id}`" class="block">
-            <div class="aspect-square bg-gray-200 flex items-center justify-center">
-              <img
-                v-if="product.image_url"
-                :src="product.image_url"
-                :alt="product.name"
-                class="w-full h-full object-cover"
-              />
-              <div v-else class="text-gray-400">
-                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
+      <div v-else-if="products_store.filteredProducts.length > 0">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div
+            v-for="product in paginatedProducts"
+            :key="product.id"
+            class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+          >
+            <!-- Product Image -->
+            <router-link :to="`/products/${product.id}`" class="block">
+              <div class="aspect-square bg-gray-200 flex items-center justify-center">
+                <img
+                  v-if="product.image_url"
+                  :src="product.image_url"
+                  :alt="product.name"
+                  class="w-full h-full object-cover"
+                />
+                <div v-else class="text-gray-400">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </router-link>
+
+            <!-- Product Info -->
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="inline-block bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full uppercase tracking-wide">
+                  {{ product.category }}
+                </span>
+                <span
+                  :class="product.stock > 0 ? 'text-green-600' : 'text-red-600'"
+                  class="text-sm font-medium"
+                >
+                  {{ product.stock > 0 ? `${product.stock} in stock` : 'Out of stock' }}
+                </span>
+              </div>
+
+              <router-link :to="`/products/${product.id}`">
+                <h3 class="font-semibold text-lg mb-2 hover:text-blue-600 transition-colors">{{ product.name }}</h3>
+              </router-link>
+              
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
+
+              <!-- Price -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-2xl font-bold text-blue-600">${{ product.price.toFixed(2) }}</span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-2">
+                <router-link
+                  :to="`/products/${product.id}`"
+                  class="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-center"
+                >
+                  View Details
+                </router-link>
+                <button
+                  v-if="product.stock > 0"
+                  @click="addToCart(product)"
+                  class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+                >
+                  Add to Cart
+                </button>
               </div>
             </div>
-          </router-link>
-
-          <!-- Product Info -->
-          <div class="p-4">
-            <div class="flex items-center justify-between mb-2">
-              <span class="inline-block bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full uppercase tracking-wide">
-                {{ product.category }}
-              </span>
-              <span
-                :class="product.stock > 0 ? 'text-green-600' : 'text-red-600'"
-                class="text-sm font-medium"
-              >
-                {{ product.stock > 0 ? `${product.stock} in stock` : 'Out of stock' }}
-              </span>
-            </div>
-
-            <router-link :to="`/products/${product.id}`">
-              <h3 class="font-semibold text-lg mb-2 hover:text-blue-600 transition-colors">{{ product.name }}</h3>
-            </router-link>
-            
-            <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
-
-            <!-- Price -->
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-2xl font-bold text-blue-600">${{ product.price.toFixed(2) }}</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-2">
-              <router-link
-                :to="`/products/${product.id}`"
-                class="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-center"
-              >
-                View Details
-              </router-link>
-              <button
-                v-if="product.stock > 0"
-                @click="addToCart(product)"
-                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
-              >
-                Add to Cart
-              </button>
-            </div>
           </div>
+        </div>
+        
+        <!-- Pagination (shows when there are products) -->
+        <div v-if="totalPages > 0" class="mt-8 flex justify-center">
+          <Paginate
+            v-model="currentPage"
+            :page-count="totalPages"
+            :page-range="5"
+            :margin-pages="2"
+            :click-handler="changePage"
+            :prev-text="'Previous'"
+            :next-text="'Next'"
+            :container-class="'pagination'"
+            :active-class="'active'"
+            :disabled-class="'disabled'"
+          />
         </div>
       </div>
 
@@ -189,13 +208,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/products_store'
 import { useCartStore } from '@/stores/cart_store'
 import type { Product } from '@/types'
+import Paginate from 'vuejs-paginate-next'
 
 const products_store = useProductStore()
 const cart_store = useCartStore()
+
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = 8
 
 // Computed
 const hasActiveFilters = computed(() => {
@@ -206,9 +230,26 @@ const filteredProductsCount = computed(() => {
   return products_store.filteredProducts.length
 })
 
+// Paginated products
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return products_store.filteredProducts.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(products_store.filteredProducts.length / itemsPerPage)
+})
+
 // Methods
 const formatCategory = (category: string) => {
   return category.charAt(0).toUpperCase() + category.slice(1)
+}
+
+const changePage = (pageNum: number) => {
+  currentPage.value = pageNum
+  // Scroll to top when changing pages
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const addToCart = (product: Product) => {
@@ -227,6 +268,11 @@ const addToCart = (product: Product) => {
   // Show success feedback (you could use a toast notification here)
   alert(`Added ${product.name} to cart!`)
 }
+
+// Reset to page 1 when filters change
+watch([() => products_store.searchQuery, () => products_store.selectedCategory], () => {
+  currentPage.value = 1
+})
 
 // Load products when component mounts
 onMounted(() => {

@@ -1,13 +1,9 @@
 <template>
-  <div class="fixed inset-0 z-50 overflow-y-auto">
-    <!-- Backdrop -->
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="$emit('close')"></div>
-
-      <!-- Modal -->
-      <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
+  <!-- Modal overlay -->
+  <div class="modal-backdrop">
+    <div class="modal-content" style="max-width: 400px;">
+        <!-- Modal header -->
+        <div class="flex-between">
           <h3 class="text-lg font-semibold text-gray-900">Update Order Status</h3>
           <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +14,7 @@
 
         <div v-if="order">
           <!-- Order Info -->
-          <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div style="margin: 1.5rem 0; padding: 1rem; background-color: #f9fafb; border-radius: 6px;">
             <p class="font-medium">{{ order.order_number }}</p>
             <p class="text-sm text-gray-600">{{ order.guest_email }}</p>
             <p class="text-sm text-gray-600">Current Status: 
@@ -30,39 +26,40 @@
 
           <!-- Status Selection -->
           <form @submit.prevent="handleSubmit">
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-3">New Status</label>
-              <div class="space-y-2">
-                <label v-for="status in statusOptions" :key="status.value" class="flex items-center">
+            <div class="form-group">
+              <label class="form-label">New Status</label>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label v-for="status in statusOptions" :key="status.value" style="display: flex; align-items: center; cursor: pointer;">
                   <input
                     v-model="selectedStatus"
                     type="radio"
                     :value="status.value"
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    style="margin-right: 0.75rem;"
                   />
-                  <span class="ml-3 flex items-center">
+                  <span style="display: flex; align-items: center;">
                     <span :class="getStatusClass(status.value)" class="inline-block px-2 py-1 rounded-full text-xs font-medium mr-2">
                       {{ status.label }}
                     </span>
-                    <span class="text-sm text-gray-600">{{ status.description }}</span>
+                    <span style="font-size: 0.875rem; color: #6b7280;">{{ status.description }}</span>
                   </span>
                 </label>
               </div>
             </div>
 
-            <!-- Actions -->
-            <div class="flex justify-end space-x-4">
+            <!-- Action buttons -->
+            <div class="flex-end">
               <button
                 type="button"
                 @click="$emit('close')"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                class="btn btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 :disabled="!selectedStatus || loading"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn-primary"
+                :class="{ 'btn-disabled': !selectedStatus || loading }"
               >
                 <span v-if="loading">Updating...</span>
                 <span v-else>Update Status</span>
@@ -70,7 +67,6 @@
             </div>
           </form>
         </div>
-      </div>
     </div>
   </div>
 </template>

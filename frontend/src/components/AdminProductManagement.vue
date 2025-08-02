@@ -79,7 +79,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
+              <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="h-10 w-10 flex-shrink-0">
@@ -141,6 +141,28 @@
         <div v-if="filteredProducts.length === 0 && !products_store.loading" class="p-8 text-center text-gray-500">
           No products found
         </div>
+        
+        <!-- Pagination (shows when there are products) -->
+        <div v-if="filteredProducts.length > 0" class="p-4 border-t">
+          <div v-if="totalPages <= 1" class="pagination">
+            <span class="page-item active">
+              <span class="page-link">Page 1</span>
+            </span>
+          </div>
+          <Paginate
+            v-else
+            v-model="currentPage"
+            :page-count="totalPages"
+            :page-range="5"
+            :margin-pages="2"
+            :click-handler="changePage"
+            :prev-text="'Previous'"
+            :next-text="'Next'"
+            :container-class="'pagination'"
+            :active-class="'active'"
+            :disabled-class="'disabled'"
+          />
+        </div>
       </div>
     </div>
 
@@ -164,11 +186,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth_store'
 import { useProductStore } from '@/stores/products_store'
 import ProductModal from '@/components/ProductModal.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import Paginate from 'vuejs-paginate-next'
 import type { Product } from '@/types'
 
 const auth_store = useAuthStore()
@@ -182,6 +205,10 @@ const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const editingProduct = ref<Product | null>(null)
 const deletingProduct = ref<Product | null>(null)
+
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = 4
 
 // Computed
 const filteredProducts = computed(() => {
@@ -205,7 +232,22 @@ const filteredProducts = computed(() => {
 
 const categories = computed(() => products_store.availableCategories)
 
+// Paginated products
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredProducts.value.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredProducts.value.length / itemsPerPage)
+})
+
 // Methods
+const changePage = (pageNum: number) => {
+  currentPage.value = pageNum
+}
+
 const editProduct = (product: Product) => {
   editingProduct.value = { ...product }
   showEditModal.value = true
@@ -246,6 +288,11 @@ const confirmDelete = async () => {
     console.error('Failed to delete product:', error)
   }
 }
+
+// Reset to page 1 when filters change
+watch([searchQuery, selectedCategory], () => {
+  currentPage.value = 1
+})
 
 // Load products on mount
 onMounted(() => {

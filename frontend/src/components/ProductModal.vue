@@ -1,13 +1,9 @@
 <template>
-  <div class="fixed inset-0 z-50 overflow-y-auto">
-    <!-- Backdrop -->
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="$emit('close')"></div>
-
-      <!-- Modal -->
-      <div class="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
+  <!-- Modal overlay that covers the whole screen -->
+  <div class="modal-backdrop">
+    <div class="modal-content">
+        <!-- Modal header with title and close button -->
+        <div class="flex-between">
           <h3 class="text-lg font-semibold text-gray-900">
             {{ isEdit ? 'Edit Product' : 'Add New Product' }}
           </h3>
@@ -18,134 +14,130 @@
           </button>
         </div>
 
-        <!-- Form -->
-        <form @submit.prevent="handleSubmit" class="space-y-6">
+        <!-- Product form with simple spacing -->
+        <form @submit.prevent="handleSubmit" style="margin-top: 1.5rem;">
           <!-- Product Name -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+          <div class="form-group">
+            <label class="form-label">Product Name *</label>
             <input
               v-model="form.name"
               type="text"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              :class="{ 'border-red-500': errors.name }"
+              class="form-input"
+              :class="{ 'form-input-error': errors.name }"
             />
-            <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
+            <p v-if="errors.name" class="form-error-text">{{ errors.name }}</p>
           </div>
 
           <!-- Description -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+          <div class="form-group">
+            <label class="form-label">Description *</label>
             <textarea
               v-model="form.description"
               rows="4"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              :class="{ 'border-red-500': errors.description }"
+              class="form-input"
+              :class="{ 'form-input-error': errors.description }"
             ></textarea>
-            <p v-if="errors.description" class="text-red-500 text-sm mt-1">{{ errors.description }}</p>
+            <p v-if="errors.description" class="form-error-text">{{ errors.description }}</p>
           </div>
 
-          <!-- Price and Category -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Price *</label>
+          <!-- Price and Category side by side -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Price *</label>
               <input
                 v-model.number="form.price"
                 type="number"
                 step="0.01"
                 min="0"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :class="{ 'border-red-500': errors.price }"
+                class="form-input"
+                :class="{ 'form-input-error': errors.price }"
               />
-              <p v-if="errors.price" class="text-red-500 text-sm mt-1">{{ errors.price }}</p>
+              <p v-if="errors.price" class="form-error-text">{{ errors.price }}</p>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <div class="form-group">
+              <label class="form-label">Category *</label>
               <input
                 v-model="form.category"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :class="{ 'border-red-500': errors.category }"
+                class="form-input"
+                :class="{ 'form-input-error': errors.category }"
                 placeholder="e.g., gi, rashguard, belt"
               />
-              <p v-if="errors.category" class="text-red-500 text-sm mt-1">{{ errors.category }}</p>
+              <p v-if="errors.category" class="form-error-text">{{ errors.category }}</p>
             </div>
           </div>
 
-          <!-- Stock and Image URL -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
+          <!-- Stock and Image URL side by side -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Stock *</label>
               <input
                 v-model.number="form.stock"
                 type="number"
                 min="0"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :class="{ 'border-red-500': errors.stock }"
+                class="form-input"
+                :class="{ 'form-input-error': errors.stock }"
               />
-              <p v-if="errors.stock" class="text-red-500 text-sm mt-1">{{ errors.stock }}</p>
+              <p v-if="errors.stock" class="form-error-text">{{ errors.stock }}</p>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Product Image URL</label>
+            <div class="form-group">
+              <label class="form-label">Product Image URL</label>
+              <input
+                v-model="form.image_url"
+                type="url"
+                class="form-input"
+                placeholder="https://example.com/image.jpg"
+              />
+              <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;">Enter a direct link to the product image</p>
               
-              <!-- Image URL Input -->
-              <div class="space-y-4">
-                <input
-                  v-model="form.image_url"
-                  type="url"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://example.com/image.jpg"
+              <!-- Image Preview -->
+              <div v-if="form.image_url" style="margin-top: 1rem;">
+                <img 
+                  :src="form.image_url" 
+                  alt="Product preview" 
+                  class="image-preview"
                 />
-                <p class="text-sm text-gray-500">Enter a direct link to the product image</p>
-                
-                <!-- Image Preview -->
-                <div v-if="form.image_url" class="relative">
-                  <img 
-                    :src="form.image_url" 
-                    alt="Product preview" 
-                    class="w-32 h-32 object-cover rounded-lg border border-gray-300"
-                  />
-                </div>
               </div>
             </div>
           </div>
 
           <!-- Size Options -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Size Options</label>
+          <div class="form-group">
+            <label class="form-label">Size Options</label>
             <input
               v-model="form.size_options"
               type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="form-input"
               placeholder="A1, A2, A3, A4 (comma separated)"
             />
-            <p class="text-sm text-gray-500 mt-1">Enter sizes separated by commas (e.g., A1, A2, A3, A4)</p>
+            <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;">Enter sizes separated by commas (e.g., A1, A2, A3, A4)</p>
           </div>
 
-          <!-- Actions -->
-          <div class="flex justify-end space-x-4 pt-6 border-t">
+          <!-- Action buttons -->
+          <div class="border-top flex-end">
             <button
               type="button"
               @click="$emit('close')"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              class="btn btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="loading"
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="btn btn-primary"
+              :class="{ 'btn-disabled': loading }"
             >
               <span v-if="loading">{{ isEdit ? 'Updating...' : 'Creating...' }}</span>
               <span v-else>{{ isEdit ? 'Update Product' : 'Create Product' }}</span>
             </button>
           </div>
         </form>
-      </div>
     </div>
   </div>
 </template>

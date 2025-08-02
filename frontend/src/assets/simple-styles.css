@@ -1,0 +1,261 @@
+/* SIMPLE REUSABLE STYLES */
+/* These are easier to understand than complex Tailwind classes */
+
+/* MODAL STYLES */
+.modal-backdrop {
+  /* Full screen overlay */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 50; /* Show above other content */
+}
+
+.modal-content {
+  /* The white box that contains the modal */
+  background: white;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Drop shadow */
+  max-width: 600px; /* Don't get too wide */
+  width: 90%; /* Take most of screen on mobile */
+  margin: 2rem auto; /* Center horizontally, space from top */
+  padding: 1.5rem; /* Space inside */
+}
+
+/* FORM STYLES */
+.form-group {
+  margin-bottom: 1rem; /* Space between form fields */
+}
+
+.form-label {
+  display: block;
+  font-weight: 600; /* Bold text */
+  color: #374151; /* Dark gray */
+  margin-bottom: 0.5rem; /* Space below label */
+  font-size: 0.875rem; /* Slightly smaller */
+}
+
+.form-input {
+  /* Style for all input fields */
+  width: 100%;
+  padding: 0.75rem; /* Space inside input */
+  border: 1px solid #d1d5db; /* Light gray border */
+  border-radius: 6px; /* Rounded corners */
+  font-size: 1rem;
+  transition: border-color 0.2s; /* Smooth color change */
+}
+
+.form-input:focus {
+  /* When user clicks in input */
+  outline: none; /* Remove default outline */
+  border-color: #3b82f6; /* Blue border */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* Blue glow */
+}
+
+.form-input-error {
+  border-color: #ef4444; /* Red border for errors */
+}
+
+.form-error-text {
+  color: #ef4444; /* Red text */
+  font-size: 0.875rem; /* Smaller text */
+  margin-top: 0.25rem; /* Small space above */
+}
+
+/* BUTTON STYLES */
+.btn {
+  /* Base button styles */
+  padding: 0.75rem 1.5rem; /* Space inside button */
+  border-radius: 6px; /* Rounded corners */
+  font-weight: 500; /* Medium bold */
+  font-size: 0.875rem; /* Slightly smaller text */
+  cursor: pointer;
+  transition: all 0.2s; /* Smooth changes */
+  border: none;
+}
+
+.btn-primary {
+  /* Blue submit/save buttons */
+  background-color: #3b82f6; /* Blue background */
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb; /* Darker blue on hover */
+}
+
+.btn-secondary {
+  /* Gray cancel buttons */
+  background-color: #f3f4f6; /* Light gray background */
+  color: #374151; /* Dark gray text */
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb; /* Slightly darker gray on hover */
+}
+
+.btn-disabled {
+  opacity: 0.5; /* Make it look faded */
+  cursor: not-allowed; /* Show "not allowed" cursor */
+}
+
+.btn-danger {
+  /* Red delete/danger buttons */
+  background-color: #dc2626; /* Red background */
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c; /* Darker red on hover */
+}
+
+/* GRID LAYOUTS */
+.form-row {
+  /* Put form fields side by side on larger screens */
+  display: grid;
+  grid-template-columns: 1fr; /* One column on mobile */
+  gap: 1rem; /* Space between items */
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr; /* Two columns on larger screens */
+  }
+}
+
+/* UTILITY CLASSES */
+.text-center {
+  text-align: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between; /* Space items apart */
+  align-items: center; /* Center vertically */
+}
+
+.flex-end {
+  display: flex;
+  justify-content: flex-end; /* Push items to right */
+  gap: 1rem; /* Space between items */
+}
+
+.border-top {
+  border-top: 1px solid #e5e7eb; /* Light gray line */
+  padding-top: 1.5rem; /* Space above */
+  margin-top: 1.5rem; /* Space above */
+}
+
+.image-preview {
+  width: 128px; /* Fixed width */
+  height: 128px; /* Fixed height */
+  object-fit: cover; /* Crop to fit */
+  border-radius: 6px; /* Rounded corners */
+  border: 1px solid #d1d5db; /* Light border */
+}
+
+/* PAGE LAYOUTS */
+.page-container {
+  max-width: 1200px; /* Don't get too wide */
+  margin: 0 auto; /* Center on page */
+  padding: 0 1rem; /* Side padding */
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr; /* One column on mobile */
+  gap: 2rem; /* Space between columns */
+}
+
+@media (min-width: 1024px) {
+  .two-column {
+    grid-template-columns: 1fr 1fr; /* Two columns on large screens */
+  }
+}
+
+.card {
+  /* White card with shadow */
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+/* NAVIGATION */
+.breadcrumb {
+  background-color: #f9fafb;
+  padding: 1rem 0;
+}
+
+.breadcrumb-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+
+.pagination li {
+  list-style: none;
+}
+
+.pagination .page-item {
+  list-style: none;
+}
+
+.pagination a,
+.pagination .page-link {
+  /* Pagination button styles */
+  display: block;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pagination .active a,
+.pagination .active .page-link {
+  /* Current page styling */
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.pagination .disabled a {
+  /* Disabled buttons (prev/next when not available) */
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.pagination .disabled a:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}

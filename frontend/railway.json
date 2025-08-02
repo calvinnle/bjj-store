@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm run build"
+    "buildCommand": "npm install && npm run type-check && npm run build-only"
   },
   "deploy": {
     "startCommand": "npm run start",

@@ -8,8 +8,8 @@
           <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
           Auto-refresh: 30s
         </div>
-        <button 
-          @click="loadOrders" 
+        <button
+          @click="loadOrders"
           class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
           :disabled="loading"
         >
@@ -59,8 +59,8 @@
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {{ error }}
         </div>
-        <button 
-          @click="loadOrders" 
+        <button
+          @click="loadOrders"
           class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Try Again
@@ -94,7 +94,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="order in filteredOrders" :key="order.id" class="hover:bg-gray-50">
+              <tr v-for="order in paginatedOrders" :key="order.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div>
                     <div class="text-sm font-medium text-gray-900">{{ order.order_number }}</div>
@@ -143,6 +143,28 @@
         <div v-if="filteredOrders.length === 0 && !loading" class="p-8 text-center text-gray-500">
           No orders found
         </div>
+        
+        <!-- Pagination (shows when there are orders) -->
+        <div v-if="filteredOrders.length > 0" class="p-4 border-t">
+          <div v-if="totalPages <= 1" class="pagination">
+            <span class="page-item active">
+              <span class="page-link">Page 1</span>
+            </span>
+          </div>
+          <Paginate
+            v-else
+            v-model="currentPage"
+            :page-count="totalPages"
+            :page-range="5"
+            :margin-pages="2"
+            :click-handler="changePage"
+            :prev-text="'Previous'"
+            :next-text="'Next'"
+            :container-class="'pagination'"
+            :active-class="'active'"
+            :disabled-class="'disabled'"
+          />
+        </div>
       </div>
     </div>
 
@@ -164,11 +186,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth_store'
 import { orderService } from '@/services/orders'
 import OrderDetailsModal from '@/components/OrderDetailsModal.vue'
 import UpdateStatusModal from '@/components/UpdateStatusModal.vue'
+import Paginate from 'vuejs-paginate-next'
 import type { Order } from '@/types'
 
 const auth_store = useAuthStore()
@@ -185,6 +208,10 @@ const showStatusModal = ref(false)
 // Auto-refresh
 let refreshInterval: NodeJS.Timeout | null = null
 const selectedOrder = ref<Order | null>(null)
+
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = 4
 
 // Computed
 const filteredOrders = computed(() => {
@@ -204,6 +231,17 @@ const filteredOrders = computed(() => {
   }
 
   return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+})
+
+// Paginated orders
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredOrders.value.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredOrders.value.length / itemsPerPage)
 })
 
 // Methods
@@ -231,16 +269,20 @@ const updateOrderStatus = (order: Order) => {
   showStatusModal.value = true
 }
 
+const changePage = (pageNum: number) => {
+  currentPage.value = pageNum
+}
+
 const handleStatusUpdate = async (orderId: number, newStatus: string) => {
   try {
     await orderService.updateOrderStatus(orderId, newStatus)
-    
+
     // Update local order
     const orderIndex = orders.value.findIndex(o => o.id === orderId)
     if (orderIndex !== -1) {
       orders.value[orderIndex].status = newStatus as any
     }
-    
+
     showStatusModal.value = false
   } catch (error) {
     console.error('Failed to update order status:', error)
@@ -270,10 +312,15 @@ const getStatusClass = (status: string) => {
   return statusClasses[status as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800'
 }
 
+// Reset to page 1 when filters change
+watch([searchQuery, selectedStatus], () => {
+  currentPage.value = 1
+})
+
 // Load orders on mount
 onMounted(() => {
   loadOrders()
-  
+
   // Set up auto-refresh every 30 seconds
   refreshInterval = setInterval(() => {
     loadOrders()

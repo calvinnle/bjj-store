@@ -21,7 +21,7 @@ export const useCartStore = defineStore('cart', {
 
     // Total price of all items
     totalPrice: (state) => {
-      return state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+      return state.items.reduce((total, item) => total + item.price * item.quantity, 0)
     },
 
     // Check if cart has items
@@ -29,7 +29,7 @@ export const useCartStore = defineStore('cart', {
 
     // Get cart items with product details
     itemsWithProducts: (state) => {
-      return state.items.filter(item => item.product)
+      return state.items.filter((item) => item.product)
     },
   },
 
@@ -38,7 +38,7 @@ export const useCartStore = defineStore('cart', {
     addItem(cartItem: CartItem) {
       // Check if item already exists (same product and size)
       const existingItemIndex = this.items.findIndex(
-        item => item.product_id === cartItem.product_id && item.size === cartItem.size
+        (item) => item.product_id === cartItem.product_id && item.size === cartItem.size,
       )
 
       if (existingItemIndex !== -1) {
@@ -51,7 +51,7 @@ export const useCartStore = defineStore('cart', {
 
       // Fetch product details for the new item
       this.fetchProductDetails(cartItem.product_id)
-      
+
       // Save to localStorage
       this.saveToStorage()
     },
@@ -59,17 +59,15 @@ export const useCartStore = defineStore('cart', {
     // Remove item from cart
     removeItem(productId: number, size: string) {
       this.items = this.items.filter(
-        item => !(item.product_id === productId && item.size === size)
+        (item) => !(item.product_id === productId && item.size === size),
       )
       this.saveToStorage()
     },
 
     // Update item quantity
     updateQuantity(productId: number, size: string, quantity: number) {
-      const item = this.items.find(
-        item => item.product_id === productId && item.size === size
-      )
-      
+      const item = this.items.find((item) => item.product_id === productId && item.size === size)
+
       if (item) {
         if (quantity <= 0) {
           this.removeItem(productId, size)
@@ -90,7 +88,7 @@ export const useCartStore = defineStore('cart', {
     async fetchProductDetails(productId: number) {
       try {
         const product = await productService.getProduct(productId)
-        const item = this.items.find(item => item.product_id === productId)
+        const item = this.items.find((item) => item.product_id === productId)
         if (item) {
           item.product = product
         }
@@ -106,9 +104,9 @@ export const useCartStore = defineStore('cart', {
 
       try {
         const productPromises = this.items
-          .filter(item => !item.product)
-          .map(item => this.fetchProductDetails(item.product_id))
-        
+          .filter((item) => !item.product)
+          .map((item) => this.fetchProductDetails(item.product_id))
+
         await Promise.all(productPromises)
       } catch (error: any) {
         this.error = 'Failed to load product details'
@@ -144,11 +142,11 @@ export const useCartStore = defineStore('cart', {
 
     // Get cart data for checkout
     getCheckoutData() {
-      return this.items.map(item => ({
+      return this.items.map((item) => ({
         product_id: item.product_id,
         quantity: item.quantity,
         size: item.size,
-        price: item.price
+        price: item.price,
       }))
     },
   },

@@ -59,7 +59,7 @@
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
         >
           <div
-            v-for="product in products_store.products"
+            v-for="product in paginatedProducts"
             :key="product.id"
             class="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
           >
@@ -132,6 +132,22 @@
             </div>
           </div>
         </div>
+        
+        <!-- Pagination (shows when there are products) -->
+        <div v-if="products_store.hasProducts && totalPages > 0" class="mt-12 flex justify-center">
+          <Paginate
+            v-model="currentPage"
+            :page-count="totalPages"
+            :page-range="5"
+            :margin-pages="2"
+            :click-handler="changePage"
+            :prev-text="'Previous'"
+            :next-text="'Next'"
+            :container-class="'pagination'"
+            :active-class="'active'"
+            :disabled-class="'disabled'"
+          />
+        </div>
 
         <!-- No Products -->
         <div v-else class="text-center py-8">
@@ -143,18 +159,40 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useProductStore } from '@/stores/products_store'
 import { useCartStore } from '@/stores/cart_store'
 import type { Product } from '@/types'
+import Paginate from 'vuejs-paginate-next'
 
 // Store with your naming convention
 const products_store = useProductStore()
 const cart_store = useCartStore()
 
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = 8
+
+// Computed
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return products_store.products.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(products_store.products.length / itemsPerPage)
+})
+
 // Methods
 const scrollToProducts = () => {
   document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+const changePage = (pageNum: number) => {
+  currentPage.value = pageNum
+  // Scroll to products section when changing pages
+  scrollToProducts()
 }
 
 const addToCart = (product: Product) => {

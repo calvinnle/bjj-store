@@ -1,19 +1,19 @@
 <template>
   <div class="checkout">
-    <!-- Navigation -->
-    <nav class="bg-gray-50 py-4">
-      <div class="container mx-auto px-4">
-        <div class="flex items-center space-x-2 text-sm text-gray-600">
-          <router-link to="/" class="hover:text-blue-600">Home</router-link>
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <!-- Navigation breadcrumb -->
+    <nav class="breadcrumb">
+      <div class="page-container">
+        <div class="breadcrumb-content">
+          <router-link to="/" style="color: #3b82f6;">Home</router-link>
+          <svg style="width: 16px; height: 16px;" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
           </svg>
-          <span class="text-gray-900">Checkout</span>
+          <span style="color: #111827;">Checkout</span>
         </div>
       </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="page-container" style="padding: 2rem 1rem;">
       <!-- Empty Cart State -->
       <div v-if="!cart_store.hasItems" class="text-center py-16">
         <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,55 +22,55 @@
         </svg>
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
         <p class="text-gray-600 mb-8">Add some items to your cart before checking out.</p>
-        <router-link to="/" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        <router-link to="/" class="btn btn-primary">
           Continue Shopping
         </router-link>
       </div>
 
       <!-- Checkout Form -->
-      <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div v-else class="two-column">
         <!-- Checkout Form -->
-        <div class="space-y-8">
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
           <div>
             <h1 class="text-2xl font-bold text-gray-900 mb-8">Checkout</h1>
 
             <!-- Customer Information -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border">
-              <h2 class="text-lg font-semibold mb-4">Customer Information</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+            <div class="card">
+              <h2 class="card-title">Customer Information</h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First Name *</label>
                   <input
                     v-model="form.shipping_address.first_name"
                     type="text"
                     required
-                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': errors.first_name }"
+                    class="form-input"
+                    :class="{ 'form-input-error': errors.first_name }"
                   />
-                  <p v-if="errors.first_name" class="text-red-500 text-sm mt-1">{{ errors.first_name }}</p>
+                  <p v-if="errors.first_name" class="form-error-text">{{ errors.first_name }}</p>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                <div class="form-group">
+                  <label class="form-label">Last Name *</label>
                   <input
                     v-model="form.shipping_address.last_name"
                     type="text"
                     required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    :class="{ 'border-red-500': errors.last_name }"
+                    class="form-input"
+                    :class="{ 'form-input-error': errors.last_name }"
                   />
-                  <p v-if="errors.last_name" class="text-red-500 text-sm mt-1">{{ errors.last_name }}</p>
+                  <p v-if="errors.last_name" class="form-error-text">{{ errors.last_name }}</p>
                 </div>
-                <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                  <input
-                    v-model="form.guest_email"
-                    type="email"
-                    required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    :class="{ 'border-red-500': errors.guest_email }"
-                  />
-                  <p v-if="errors.guest_email" class="text-red-500 text-sm mt-1">{{ errors.guest_email }}</p>
-                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input
+                  v-model="form.guest_email"
+                  type="email"
+                  required
+                  class="form-input"
+                  :class="{ 'form-input-error': errors.guest_email }"
+                />
+                <p v-if="errors.guest_email" class="form-error-text">{{ errors.guest_email }}</p>
               </div>
             </div>
 

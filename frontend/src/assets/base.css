@@ -1,67 +1,68 @@
-/* Base reset and normalize */
+/* BASIC RESET - Remove default browser styles */
+/* This makes all elements start with no margins/padding */
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  box-sizing: border-box; /* Makes width/height include padding and border */
+  margin: 0; /* Remove default margins */
+  padding: 0; /* Remove default padding */
 }
 
+/* HTML page settings */
 html {
-  line-height: 1.15;
-  -webkit-text-size-adjust: 100%;
+  line-height: 1.15; /* Readable line spacing */
+  -webkit-text-size-adjust: 100%; /* Prevent text scaling on mobile */
+  scroll-behavior: smooth; /* Smooth scrolling when clicking links */
 }
 
+/* BODY - Main page styling */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+  /* Use system fonts that look good on all devices */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  /* Make fonts look smoother */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #ffffff;
-  color: #1f2937;
-  line-height: 1.6;
+  /* Set colors */
+  background-color: #ffffff; /* White background */
+  color: #1f2937; /* Dark gray text */
+  line-height: 1.6; /* Comfortable line spacing */
 }
 
-/* Remove default button styles */
+/* BUTTONS - Remove default styles so we can style them ourselves */
 button {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  cursor: pointer;
+  background: none; /* No background */
+  border: none; /* No border */
+  padding: 0; /* No padding */
+  margin: 0; /* No margin */
+  font: inherit; /* Use same font as parent */
+  cursor: pointer; /* Show hand cursor on hover */
 }
 
-/* Remove default input styles */
+/* FORM INPUTS - Use same font as rest of page */
 input, textarea, select {
   font: inherit;
 }
 
-/* Remove default link styles */
+/* LINKS - Remove default blue color and underline */
 a {
-  color: inherit;
-  text-decoration: none;
+  color: inherit; /* Use same color as parent */
+  text-decoration: none; /* No underline */
 }
 
-/* Remove default list styles */
+/* LISTS - Remove default bullets and numbers */
 ul, ol {
   list-style: none;
 }
 
-/* Ensure images are responsive */
+/* IMAGES - Make them responsive (never overflow container) */
 img {
-  max-width: 100%;
-  height: auto;
+  max-width: 100%; /* Never wider than container */
+  height: auto; /* Keep proportions */
 }
 
-/* Focus styles for accessibility */
+/* FOCUS - Show blue outline when using keyboard navigation */
 :focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+  outline: 2px solid #3b82f6; /* Blue outline */
+  outline-offset: 2px; /* Small gap around element */
 }

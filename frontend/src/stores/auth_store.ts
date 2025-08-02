@@ -40,13 +40,13 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await authService.login(email, password)
-        
+
         // Store token
         authService.setToken(response.token)
-        
+
         // Set user
         this.user = response.admin
-        
+
         return response
       } catch (error: any) {
         this.error = error.response?.data?.error || 'Login failed'
@@ -89,7 +89,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = await authService.getProfile()
       } catch (error: any) {
         this.error = error.response?.data?.error || 'Failed to load profile'
-        
+
         // If unauthorized, clear auth state
         if (error.response?.status === 401) {
           authService.removeToken()
