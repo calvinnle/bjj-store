@@ -206,7 +206,7 @@ const showOrderModal = ref(false)
 const showStatusModal = ref(false)
 
 // Auto-refresh
-let refreshInterval: NodeJS.Timeout | null = null
+let refreshInterval: number | null = null
 const selectedOrder = ref<Order | null>(null)
 
 // Pagination
