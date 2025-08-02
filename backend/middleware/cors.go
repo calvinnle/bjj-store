@@ -1,10 +1,8 @@
 package middleware
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
-	"github.com/lenguyenkhang/bjj-store/config"
+	"github.com/calvinnle/bjj-store/backend/config"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
