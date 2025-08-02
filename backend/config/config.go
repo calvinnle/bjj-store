@@ -14,6 +14,7 @@ type Config struct {
 	JWT      JWTConfig      `mapstructure:"jwt"`
 	Stripe   StripeConfig   `mapstructure:"stripe"`
 	Admin    AdminConfig    `mapstructure:"admin"`
+	CORS     CORSConfig     `mapstructure:"cors"`
 }
 
 type AdminConfig struct {
@@ -42,6 +43,10 @@ type JWTConfig struct {
 type StripeConfig struct {
 	SecretKey     string `mapstructure:"secret_key"`
 	WebhookSecret string `mapstructure:"webhook_secret"`
+}
+
+type CORSConfig struct {
+	AllowedOrigins []string `mapstructure:"allowed_origins"`
 }
 
 
@@ -124,6 +129,9 @@ func setDefaults() {
 
 	viper.SetDefault("stripe.secret_key", "")
 	viper.SetDefault("stripe.webhook_secret", "")
+
+	// CORS defaults
+	viper.SetDefault("cors.allowed_origins", []string{"http://localhost:5173"})
 
 }
 
@@ -304,6 +312,13 @@ func overrideWithEnvVars(config *Config) {
 	if password := os.Getenv("ADMIN_DEFAULT_PASSWORD"); password != "" {
 		config.Admin.DefaultPassword = password
 		log.Printf("✓ Override ADMIN_DEFAULT_PASSWORD: [HIDDEN]")
+	}
+	
+	// CORS overrides
+	if origins := os.Getenv("CORS_ALLOWED_ORIGINS"); origins != "" {
+		// Split comma-separated origins
+		config.CORS.AllowedOrigins = strings.Split(origins, ",")
+		log.Printf("✓ Override CORS_ALLOWED_ORIGINS: %v", config.CORS.AllowedOrigins)
 	}
 	
 	log.Printf("=== FINAL CONFIG VALUES ===")
