@@ -41,6 +41,7 @@ export interface Order {
   items: OrderItem[]
   total_amount: number
   status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled'
+  stripe_payment_id?: string
   created_at: string
   updated_at: string
 }
