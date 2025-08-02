@@ -18,7 +18,14 @@ export default defineConfig({
   preview: {
     host: true,
     port: parseInt(process.env.PORT || '8080'),
-    strictPort: true
+    strictPort: true,
+    allowedHosts: [
+      'abundant-caring-production-f136.up.railway.app',
+      '.railway.app',
+      'localhost',
+      '127.0.0.1',
+      'all'
+    ]
   },
   server: {
     host: '0.0.0.0',
