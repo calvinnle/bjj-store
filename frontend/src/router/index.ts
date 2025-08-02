@@ -65,7 +65,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   if (to.meta.requiresAuth) {
     const authStore = useAuthStore()
-    
+
     // If we have a token but no user loaded, try to load it
     const hasToken = localStorage.getItem('admin_token')
     if (hasToken && !authStore.user && !authStore.loading) {
@@ -80,7 +80,7 @@ router.beforeEach(async (to) => {
         }
       }
     }
-    
+
     if (!authStore.isAuthenticated) {
       return {
         name: 'admin-login',

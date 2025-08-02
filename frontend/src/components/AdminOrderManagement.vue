@@ -50,7 +50,9 @@
     <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
       <!-- Loading State -->
       <div v-if="loading" class="p-8 text-center">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
         <p class="mt-2 text-gray-600">Loading orders...</p>
       </div>
 
@@ -73,22 +75,35 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Order
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Customer
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Date
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Total
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
-                <th v-if="auth_store.canManageOrders" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  v-if="auth_store.canManageOrders"
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Actions
                 </th>
               </tr>
@@ -116,15 +131,18 @@
                   ${{ order.total_amount.toFixed(2) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="getStatusClass(order.status)" class="px-2 py-1 text-xs font-medium rounded-full">
+                  <span
+                    :class="getStatusClass(order.status)"
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                  >
                     {{ formatStatus(order.status) }}
                   </span>
                 </td>
-                <td v-if="auth_store.canManageOrders" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                  <button
-                    @click="viewOrder(order)"
-                    class="text-blue-600 hover:text-blue-900"
-                  >
+                <td
+                  v-if="auth_store.canManageOrders"
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
+                >
+                  <button @click="viewOrder(order)" class="text-blue-600 hover:text-blue-900">
                     View
                   </button>
                   <button
@@ -143,7 +161,7 @@
         <div v-if="filteredOrders.length === 0 && !loading" class="p-8 text-center text-gray-500">
           No orders found
         </div>
-        
+
         <!-- Pagination (shows when there are orders) -->
         <div v-if="filteredOrders.length > 0" class="p-4 border-t">
           <div v-if="totalPages <= 1" class="pagination">
@@ -219,18 +237,23 @@ const filteredOrders = computed(() => {
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(order =>
-      order.order_number.toLowerCase().includes(query) ||
-      order.guest_email.toLowerCase().includes(query) ||
-      `${order.shipping_address.first_name} ${order.shipping_address.last_name}`.toLowerCase().includes(query)
+    filtered = filtered.filter(
+      (order) =>
+        order.order_number.toLowerCase().includes(query) ||
+        order.guest_email.toLowerCase().includes(query) ||
+        `${order.shipping_address.first_name} ${order.shipping_address.last_name}`
+          .toLowerCase()
+          .includes(query),
     )
   }
 
   if (selectedStatus.value) {
-    filtered = filtered.filter(order => order.status === selectedStatus.value)
+    filtered = filtered.filter((order) => order.status === selectedStatus.value)
   }
 
-  return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  return filtered.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )
 })
 
 // Paginated orders
@@ -278,7 +301,7 @@ const handleStatusUpdate = async (orderId: number, newStatus: string) => {
     await orderService.updateOrderStatus(orderId, newStatus)
 
     // Update local order
-    const orderIndex = orders.value.findIndex(o => o.id === orderId)
+    const orderIndex = orders.value.findIndex((o) => o.id === orderId)
     if (orderIndex !== -1) {
       orders.value[orderIndex].status = newStatus as any
     }
@@ -293,7 +316,7 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
@@ -307,7 +330,7 @@ const getStatusClass = (status: string) => {
     paid: 'bg-blue-100 text-blue-800',
     shipped: 'bg-purple-100 text-purple-800',
     delivered: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800'
+    cancelled: 'bg-red-100 text-red-800',
   }
   return statusClasses[status as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800'
 }
