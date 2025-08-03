@@ -4,8 +4,8 @@ A full-stack e-commerce application built with Vue.js frontend and Go backend, s
 
 ## Live Demo
 
-- **Frontend**: https://your-frontend.railway.app
-- **Admin Dashboard**: https://your-frontend.railway.app/admin
+- **Frontend**: https://abundant-caring-production-f136.up.railway.app/
+- **Admin Dashboard**: https://abundant-caring-production-f136.up.railway.app/admin
 - **API Documentation**: https://your-backend.railway.app/swagger/index.html
 
 ## Admin Access
